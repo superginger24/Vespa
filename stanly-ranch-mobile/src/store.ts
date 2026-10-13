@@ -2,8 +2,9 @@ import { useCallback, useEffect, useReducer, useState } from 'react'
 import { ME, seedRooms, seedTickets } from './data'
 import type { HkRoom, Note, RoomStatus, Ticket, TicketStatus } from './types'
 
-const KEY = 'stn-tickets-v2'
-const today = () => new Date().toDateString()
+const KEY = 'stn-tickets-v3'
+const FRESH_MS = 3 * 3600_000
+let seededAt = Date.now()
 
 type Action =
   | { type: 'create'; ticket: Ticket }
@@ -16,9 +17,12 @@ type Action =
 function load(): Ticket[] {
   try {
     const raw = localStorage.getItem(KEY)
-    // Seed data is dated relative to load time, so start fresh each day
-    const saved = raw ? (JSON.parse(raw) as { day: string; tickets: Ticket[] }) : null
-    if (saved && saved.day === today()) return saved.tickets
+    // Demo due times are relative to when they were seeded, so start fresh after a few hours
+    const saved = raw ? (JSON.parse(raw) as { seededAt: number; tickets: Ticket[] }) : null
+    if (saved && Date.now() - saved.seededAt < FRESH_MS) {
+      seededAt = saved.seededAt
+      return saved.tickets
+    }
   } catch {
     // fall through to seed data
   }
@@ -51,7 +55,7 @@ export function useTickets() {
   const [tickets, dispatch] = useReducer(reducer, undefined, load)
 
   useEffect(() => {
-    localStorage.setItem(KEY, JSON.stringify({ day: today(), tickets }))
+    localStorage.setItem(KEY, JSON.stringify({ seededAt, tickets }))
   }, [tickets])
 
   return { tickets, dispatch }
@@ -84,6 +88,7 @@ export function useWorkspace() {
   )
 
   const reset = useCallback(() => {
+    seededAt = Date.now()
     dispatch({ type: 'reset' })
     setRooms(seedRooms())
   }, [dispatch])

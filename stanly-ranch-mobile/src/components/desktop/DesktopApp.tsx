@@ -33,6 +33,7 @@ export function DesktopApp({ ws, now }: { ws: Workspace; now: number }) {
           ))}
         </div>
         <span className="dnav__user">
+          <span className="demo-tag">Demo data</span>
           <Avatar name={ME} size={28} />
           {ME}
         </span>

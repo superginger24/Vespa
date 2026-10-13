@@ -3,6 +3,13 @@ import { generateTips } from '../tips'
 import type { Guest } from '../types'
 import { SparkIcon } from './icons'
 
+const shortDate = (iso: string) => new Date(iso).toLocaleDateString([], { month: 'short', day: 'numeric' })
+
+function stayLabel(g: Guest) {
+  const nights = Math.max(1, Math.round((new Date(g.departure).getTime() - new Date(g.arrival).getTime()) / 86400_000))
+  return `Stay: ${shortDate(g.arrival)} to ${shortDate(g.departure)}, ${nights} ${nights === 1 ? 'night' : 'nights'}`
+}
+
 interface Props {
   guest: Guest
   /** When provided, tips can be saved as a staff note on that ticket. */
@@ -37,6 +44,20 @@ export function GuestMemory({ guest, onSaveNote, saveHint }: Props) {
             <span key={p} className="pill">{p}</span>
           ))}
         </div>
+      )}
+
+      <p className="memory__stay">{stayLabel(guest)}</p>
+
+      {guest.stayNotes.length > 0 && (
+        <>
+          <h4 className="subhead">Stay notes</h4>
+          {guest.stayNotes.map((n) => (
+            <div key={n.text} className="staynote">
+              <p>{n.text}</p>
+              <span>{n.source}</span>
+            </div>
+          ))}
+        </>
       )}
 
       <h4 className="subhead">Conversation starters</h4>

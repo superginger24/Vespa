@@ -22,10 +22,10 @@ export const formatTime = (iso: string) =>
 export function formatRemaining(iso: string, now: number) {
   const mins = Math.round((new Date(iso).getTime() - now) / 60_000)
   const abs = Math.abs(mins)
-  const sign = mins < 0 ? '-' : ''
-  if (abs >= 1440) return `${sign}${Math.floor(abs / 1440)}d`
-  if (abs >= 60) return `${sign}${Math.floor(abs / 60)}h ${abs % 60}m`
-  return `${sign}${abs}m`
+  const late = mins < 0 ? ' late' : ''
+  if (abs >= 1440) return `${Math.floor(abs / 1440)}d${late}`
+  if (abs >= 60) return `${Math.floor(abs / 60)}h ${abs % 60}m${late}`
+  return `${abs}m${late}`
 }
 
 export const uid = () => Math.random().toString(36).slice(2, 10)

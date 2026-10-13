@@ -12,6 +12,11 @@ export interface ActivityItem {
   category: 'dining' | 'activity' | 'arrival' | 'request' | 'spa'
 }
 
+export interface StayNote {
+  text: string
+  source: string
+}
+
 export interface Guest {
   id: string
   name: string
@@ -20,6 +25,7 @@ export interface Guest {
   departure: string
   vip?: boolean
   preferences: string[]
+  stayNotes: StayNote[]
   activity: ActivityItem[]
 }
 
